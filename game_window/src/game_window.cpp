@@ -4,6 +4,7 @@ int x = 0;
 
 GameWindow::GameWindow() {
     game_is_running = initialize_window();
+    this->keyboard_input = Input();
 }
 
 GameWindow::~GameWindow() {
@@ -58,13 +59,19 @@ void GameWindow::process_window_events() {
         case SDL_KEYDOWN:
         {
             auto key_pressed = event.key.keysym.sym;
+            auto key_state   = SDL_KEYDOWN;
 
-            if (key_pressed == SDLK_ESCAPE) 
-                game_is_running = false;
+            std::cout << "key pressed: " << key_pressed << std::endl;
+            std::cout << "SDLK_RIGHT: " << SDLK_RIGHT << std::endl;
 
-            if (key_pressed == SDLK_RIGHT)
-                x++;
-
+            this->keyboard_input.handle_keyboard_event(key_pressed,key_state);
+            break;
+        }
+        case SDL_KEYUP:
+        {
+            auto key_pressed = event.key.keysym.sym;
+            auto key_state   = SDL_KEYUP;
+            this->keyboard_input.handle_keyboard_event(key_pressed,key_state);
             break;
         }
         default:
@@ -73,7 +80,9 @@ void GameWindow::process_window_events() {
 }
 
 void GameWindow::update() {
-    
+    if(Input::is_key_pressed(SDLK_RIGHT)) {
+        x++;
+    }
 }
 
 void GameWindow::render() {
@@ -95,7 +104,6 @@ void GameWindow::render() {
 }
 
 void GameWindow::start_loop() {
-
     auto last_time         = SDL_GetTicks();
     double amount_of_ticks = 60.0;
     double ns              = 1000000000 / amount_of_ticks;
