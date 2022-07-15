@@ -4,12 +4,10 @@
 #include<SDL2/SDL.h>
 #include<iostream>
 #include"../../input/include/input.hpp"
+#include"../../entity/include/paddle.hpp"
 
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH  800
-
-#define FPS 30
-#define FRAME_TARGET_TIME (1000 / FPS)
 
 #define WINDOW_NAME "Game"
 
@@ -17,6 +15,9 @@ class GameWindow {
 
     SDL_Window*   window   = NULL;
     SDL_Renderer* renderer = NULL;
+
+    Paddle player;
+    Paddle enemy;
 
     bool game_is_running = false;
 

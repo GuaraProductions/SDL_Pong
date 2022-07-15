@@ -1,17 +1,25 @@
 #include "game_window.hpp"
 
-int player1_x     = WINDOW_WIDTH/2;
-int player1_y     = 10;
-int player1_speed = 5;
-
-int player2_x     = WINDOW_WIDTH/2;
-int player2_y     = WINDOW_HEIGHT-35;
-int player2_speed = 5;
-
-
 GameWindow::GameWindow() {
     game_is_running = initialize_window();
     this->keyboard_input = Input();
+
+    SDL_Color player_color = {
+        0,
+        168,
+        107,
+        255
+    };
+
+    SDL_Color enemy_color = {
+        205,
+        92,
+        92,
+        255
+    };
+
+    this->player = Paddle(WINDOW_WIDTH/2,0,150,50,player_color);
+    this->enemy  = Paddle(WINDOW_WIDTH/2,WINDOW_HEIGHT-50,150,50,enemy_color);
 }
 
 GameWindow::~GameWindow() {
@@ -57,6 +65,7 @@ void GameWindow::process_window_events() {
 
     SDL_Event event;
     SDL_PollEvent(&event);
+    SDL_PumpEvents();
 
     switch(event.type) {
         case SDL_QUIT:
@@ -83,43 +92,33 @@ void GameWindow::process_window_events() {
 }
 
 void GameWindow::update() {
-    if (Input::is_key_pressed(SDL_SCANCODE_RIGHT)) 
-        player1_x += player1_speed;
-    else if (Input::is_key_pressed(SDL_SCANCODE_LEFT)) 
-        player1_x -= player1_speed;
-    
-    if (Input::is_key_pressed(SDL_SCANCODE_A)) 
-        player2_x -= player2_speed;
-    else if (Input::is_key_pressed(SDL_SCANCODE_D))
-        player2_x += player2_speed;
-
-    if (Input::is_key_pressed(SDL_SCANCODE_ESCAPE)) 
+    if (Input::is_key_pressed(SDL_SCANCODE_RIGHT)) {
+        player.move_x(1);
+    } else if (Input::is_key_pressed(SDL_SCANCODE_LEFT)) {
+        player.move_x(-1);
+    }
+    if (Input::is_key_pressed(SDL_SCANCODE_A)) {
+        enemy.move_x(-1);
+    } else if (Input::is_key_pressed(SDL_SCANCODE_D)) {
+        enemy.move_x(1);
+    }
+    if (Input::is_key_pressed(SDL_SCANCODE_ESCAPE)) {
         game_is_running = false;
+    }
+
+    player.update();
+    enemy.update();
     
 }
 
 void GameWindow::render() {
-    SDL_SetRenderDrawColor(renderer, 100,50,100,255);
+
+    // Background color
+    SDL_SetRenderDrawColor(renderer, 35,35,35,255);
     SDL_RenderClear(renderer);
-    
-    SDL_Rect player1_pad = {
-        player1_x,
-        player1_y,
-        150,
-        25,
-    };
 
-    SDL_Rect player2_pad = {
-        player2_x,
-        player2_y,
-        150,
-        25,
-    };
-
-    SDL_SetRenderDrawColor(renderer,255,255,255,255);
-    SDL_RenderFillRect(renderer,&player1_pad);
-    SDL_SetRenderDrawColor(renderer,0,0,0,255);
-    SDL_RenderFillRect(renderer,&player2_pad);
+    player.render(renderer);
+    enemy.render(renderer);
 
     SDL_RenderPresent(renderer);
 

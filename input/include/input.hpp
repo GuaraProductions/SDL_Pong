@@ -2,7 +2,6 @@
 #define INPUT_HPP
 
 #include<SDL2/SDL.h>
-#include<unordered_map>
 
 class Input {
 
