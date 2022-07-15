@@ -1,6 +1,13 @@
 #include "game_window.hpp"
 
-int x = 0;
+int player1_x     = WINDOW_WIDTH/2;
+int player1_y     = 10;
+int player1_speed = 5;
+
+int player2_x     = WINDOW_WIDTH/2;
+int player2_y     = WINDOW_HEIGHT-35;
+int player2_speed = 5;
+
 
 GameWindow::GameWindow() {
     game_is_running = initialize_window();
@@ -35,7 +42,7 @@ bool GameWindow::initialize_window()
         exit(1);
     }
 
-    renderer = SDL_CreateRenderer(window, -1, 0);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
 
     if (renderer == NULL)
     {
@@ -60,18 +67,14 @@ void GameWindow::process_window_events() {
         {
             auto key_pressed = event.key.keysym.sym;
             auto key_state   = SDL_KEYDOWN;
-
-            std::cout << "key pressed: " << key_pressed << std::endl;
-            std::cout << "SDLK_RIGHT: " << SDLK_RIGHT << std::endl;
-
-            this->keyboard_input.handle_keyboard_event(key_pressed,key_state);
+            this->keyboard_input.handle_keyboard_event();
             break;
         }
         case SDL_KEYUP:
         {
             auto key_pressed = event.key.keysym.sym;
             auto key_state   = SDL_KEYUP;
-            this->keyboard_input.handle_keyboard_event(key_pressed,key_state);
+            this->keyboard_input.handle_keyboard_event();
             break;
         }
         default:
@@ -80,46 +83,54 @@ void GameWindow::process_window_events() {
 }
 
 void GameWindow::update() {
-    if(Input::is_key_pressed(SDLK_RIGHT)) {
-        x++;
-    }
+    if (Input::is_key_pressed(SDL_SCANCODE_RIGHT)) 
+        player1_x += player1_speed;
+    else if (Input::is_key_pressed(SDL_SCANCODE_LEFT)) 
+        player1_x -= player1_speed;
+    
+    if (Input::is_key_pressed(SDL_SCANCODE_A)) 
+        player2_x -= player2_speed;
+    else if (Input::is_key_pressed(SDL_SCANCODE_D))
+        player2_x += player2_speed;
+
+    if (Input::is_key_pressed(SDL_SCANCODE_ESCAPE)) 
+        game_is_running = false;
+    
 }
 
 void GameWindow::render() {
     SDL_SetRenderDrawColor(renderer, 100,50,100,255);
     SDL_RenderClear(renderer);
     
-    SDL_Rect ball = {
-        x,
+    SDL_Rect player1_pad = {
+        player1_x,
+        player1_y,
         150,
-        50,
-        50,
+        25,
+    };
+
+    SDL_Rect player2_pad = {
+        player2_x,
+        player2_y,
+        150,
+        25,
     };
 
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
-    SDL_RenderFillRect(renderer,&ball);
+    SDL_RenderFillRect(renderer,&player1_pad);
+    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+    SDL_RenderFillRect(renderer,&player2_pad);
 
     SDL_RenderPresent(renderer);
 
 }
 
 void GameWindow::start_loop() {
-    auto last_time         = SDL_GetTicks();
-    double amount_of_ticks = 60.0;
-    double ns              = 1000000000 / amount_of_ticks;
-    double delta           = 0.0;
 
     while(game_is_running) {
-        
-        auto now = SDL_GetTicks();
-        delta    += now - last_time / ns;
-        last_time = now;
-        if (delta >= 1) {
-            process_window_events();
-            update();
-            render();
-            delta--;
-        }
+        process_window_events();
+        update();
+        render();
     }
 }
 
