@@ -18,8 +18,17 @@ GameWindow::GameWindow() {
         255
     };
 
-    this->player = Paddle(WINDOW_WIDTH/2,0,150,50,player_color);
-    this->enemy  = Paddle(WINDOW_WIDTH/2,WINDOW_HEIGHT-50,150,50,enemy_color);
+    SDL_Color ball_color = {
+        255,
+        255,
+        255,
+        255
+    };
+
+
+    this->player = Paddle(15,WINDOW_HEIGHT/2-75,25,150,player_color);
+    this->enemy  = Paddle(WINDOW_WIDTH-35,WINDOW_HEIGHT/2-75,25,150,enemy_color);
+    this->ball   = Ball(WINDOW_WIDTH/2-10,WINDOW_HEIGHT/2,10,10,ball_color);
 }
 
 GameWindow::~GameWindow() {
@@ -92,15 +101,15 @@ void GameWindow::process_window_events() {
 }
 
 void GameWindow::update() {
-    if (Input::is_key_pressed(SDL_SCANCODE_RIGHT)) {
-        player.move_x(1);
-    } else if (Input::is_key_pressed(SDL_SCANCODE_LEFT)) {
-        player.move_x(-1);
+    if (Input::is_key_pressed(SDL_SCANCODE_UP)) {
+        player.move_y(-1);
+    } else if (Input::is_key_pressed(SDL_SCANCODE_DOWN)) {
+        player.move_y(1);
     }
-    if (Input::is_key_pressed(SDL_SCANCODE_A)) {
-        enemy.move_x(-1);
-    } else if (Input::is_key_pressed(SDL_SCANCODE_D)) {
-        enemy.move_x(1);
+    if (Input::is_key_pressed(SDL_SCANCODE_W)) {
+        enemy.move_y(-1);
+    } else if (Input::is_key_pressed(SDL_SCANCODE_S)) {
+        enemy.move_y(1);
     }
     if (Input::is_key_pressed(SDL_SCANCODE_ESCAPE)) {
         game_is_running = false;
@@ -108,6 +117,7 @@ void GameWindow::update() {
 
     player.update();
     enemy.update();
+    ball.update();
     
 }
 
@@ -117,8 +127,15 @@ void GameWindow::render() {
     SDL_SetRenderDrawColor(renderer, 35,35,35,255);
     SDL_RenderClear(renderer);
 
+    SDL_SetRenderDrawColor(renderer,
+                        255,
+                        255,
+                        255,
+                        255);
+
     player.render(renderer);
     enemy.render(renderer);
+    ball.render(renderer);
 
     SDL_RenderPresent(renderer);
 

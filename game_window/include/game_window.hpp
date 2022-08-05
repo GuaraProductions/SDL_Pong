@@ -5,6 +5,7 @@
 #include<iostream>
 #include"../../input/include/input.hpp"
 #include"../../entity/include/paddle.hpp"
+#include"../../entity/include/ball.hpp"
 
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH  800
@@ -18,6 +19,7 @@ class GameWindow {
 
     Paddle player;
     Paddle enemy;
+    Ball ball;
 
     bool game_is_running = false;
 
@@ -35,6 +37,7 @@ class GameWindow {
 
         void render(void);
         void update(void);
+        
 };
 
 #endif
